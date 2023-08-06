@@ -27,33 +27,39 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.MediaItem.AdsConfiguration
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider
-import com.google.android.exoplayer2.drm.FrameworkMediaDrm
-import com.google.android.exoplayer2.ext.ima.ImaAdsLoader
-import com.google.android.exoplayer2.ext.ima.ImaServerSideAdInsertionMediaSource
-import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.DecoderInitializationException
-import com.google.android.exoplayer2.mediacodec.MediaCodecUtil.DecoderQueryException
-import com.google.android.exoplayer2.offline.DownloadRequest
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ads.AdsLoader
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
-import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.google.android.exoplayer2.ui.StyledPlayerView.ControllerVisibilityListener
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.util.DebugTextViewHelper
-import com.google.android.exoplayer2.util.ErrorMessageProvider
-import com.google.android.exoplayer2.util.EventLogger
-import com.google.android.exoplayer2.util.Util
+import androidx.media3.exoplayer.*
+import androidx.media3.common.MediaItem.AdsConfiguration
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.exoplayer.drm.DefaultDrmSessionManagerProvider
+import androidx.media3.exoplayer.drm.FrameworkMediaDrm
+import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.DecoderInitializationException
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.DecoderQueryException
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ads.AdsLoader
+import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.datasource.DataSource
+import androidx.media3.exoplayer.util.DebugTextViewHelper
+import androidx.media3.common.ErrorMessageProvider
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.util.Util
+import androidx.media3.exoplayer.ima.ImaAdsLoader
+import androidx.media3.exoplayer.ima.ImaServerSideAdInsertionMediaSource
+import androidx.media3.exoplayer.util.EventLogger
+import androidx.media3.ui.PlayerView
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull
 import kotlin.math.max
 
-/** An activity that plays media using [ExoPlayer].  */
-class PlayerActivity : AppCompatActivity(), View.OnClickListener, ControllerVisibilityListener {
-    private var playerView: StyledPlayerView? = null
+@UnstableApi /** An activity that plays media using [ExoPlayer].  */
+class PlayerActivity : AppCompatActivity(), View.OnClickListener,
+    PlayerView.ControllerVisibilityListener {
+    private var playerView: PlayerView? = null
     private var debugRootView: LinearLayout? = null
     private var debugTextView: TextView? = null
     private var player: ExoPlayer? = null
@@ -209,7 +215,7 @@ class PlayerActivity : AppCompatActivity(), View.OnClickListener, ControllerVisi
         }
     }
 
-    // StyledPlayerView.ControllerVisibilityListener implementation
+    // PlayerView.ControllerVisibilityListener implementation
     override fun onVisibilityChanged(visibility: Int) {
         debugRootView?.visibility = visibility
     }
