@@ -1,10 +1,10 @@
 # ExoPlayerDemoKotlin
 
-ExoPlayerDemoKotlin is a demo application for [ExoPlayer][].
+ExoPlayerDemoKotlin is a demo application for [Media3 ExoPlayer][].
 
-[ExoPlayer]: https://exoplayer.dev
+[Media3 ExoPlayer]: https://developer.android.com/guide/topics/media/exoplayer
 
 Original demo is written in Java.
-You can find original demo project at [ExoPlayer github page][].
+You can find original demo project at [Media3 ExoPlayer github page]
 
-[ExoPlayer github page]: https://github.com/google/ExoPlayer/tree/release-v2/demos/main
+[Media3 ExoPlayer github page]: https://github.com/androidx/media/tree/release/demos/main
