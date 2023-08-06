@@ -15,24 +15,28 @@
  */
 package com.google.android.exoplayer2.demo
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.JsonReader
 import android.view.*
 import android.widget.*
 import android.widget.ExpandableListView.OnChildClickListener
+import androidx.annotation.DoNotInline
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.*
 import androidx.media3.common.MediaItem.*
-import androidx.media3.exoplayer.offline.DownloadService
+import androidx.media3.common.util.*
 import androidx.media3.datasource.DataSourceInputStream
 import androidx.media3.datasource.DataSourceUtil
 import androidx.media3.datasource.DataSpec
-import androidx.media3.common.util.*
-import androidx.media3.common.*
+import androidx.media3.exoplayer.offline.DownloadService
 import com.google.common.base.Objects
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
@@ -51,6 +55,8 @@ class SampleChooserActivity : AppCompatActivity(), DownloadTracker.Listener, OnC
     private var sampleAdapter: SampleAdapter? = null
     private var preferExtensionDecodersMenuItem: MenuItem? = null
     private var sampleListView: ExpandableListView? = null
+    private var downloadMediaItemWaitingForNotificationPermission: MediaItem? = null
+    private var notificationPermissionToastShown = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,12 +140,38 @@ class SampleChooserActivity : AppCompatActivity(), DownloadTracker.Listener, OnC
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == POST_NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            handlePostNotificationPermissionGrantResults(grantResults)
+        } else {
+            handleExternalStoragePermissionGrantResults(grantResults)
+        }
+    }
+
+    private fun handlePostNotificationPermissionGrantResults(grantResults: IntArray) {
+        if (!notificationPermissionToastShown
+            && (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED)
+        ) {
+            Toast.makeText(
+                applicationContext, R.string.post_notification_not_granted, Toast.LENGTH_LONG
+            )
+                .show()
+            notificationPermissionToastShown = true
+        }
+        if (downloadMediaItemWaitingForNotificationPermission != null) {
+            // Download with or without permission to post notifications.
+            downloadMediaItemWaitingForNotificationPermission?.let { mediaItem ->
+                toggleDownload(mediaItem)
+            }
+            downloadMediaItemWaitingForNotificationPermission = null
+        }
+    }
+
+    private fun handleExternalStoragePermissionGrantResults(grantResults: IntArray) {
         if (grantResults.isEmpty()) {
             // Empty results are triggered if a permission is requested while another request was already
             // pending and can be safely ignored in this case.
             return
-        }
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             loadSample()
         } else {
             Toast.makeText(applicationContext, R.string.sample_list_load_error, Toast.LENGTH_LONG)
@@ -204,14 +236,27 @@ class SampleChooserActivity : AppCompatActivity(), DownloadTracker.Listener, OnC
         if (downloadUnsupportedStringId != 0) {
             Toast.makeText(applicationContext, downloadUnsupportedStringId, Toast.LENGTH_LONG)
                 .show()
+        } else if (
+            !notificationPermissionToastShown &&
+            Build.VERSION.SDK_INT >= 33 && (checkSelfPermission(
+                Api33.postNotificationPermissionString
+            ) != PackageManager.PERMISSION_GRANTED)
+        ) {
+            downloadMediaItemWaitingForNotificationPermission = playlistHolder.mediaItems[0]
+            requestPermissions(
+                arrayOf(Api33.postNotificationPermissionString),
+                /* requestCode= */ POST_NOTIFICATION_PERMISSION_REQUEST_CODE
+            )
         } else {
-            val renderersFactory = DemoUtil.buildRenderersFactory(
-                this, isNonNullAndChecked(preferExtensionDecodersMenuItem)
-            )
-            downloadTracker?.toggleDownload(
-                supportFragmentManager, playlistHolder.mediaItems[0], renderersFactory
-            )
+            toggleDownload(playlistHolder.mediaItems.first())
         }
+    }
+
+    private fun toggleDownload(mediaItem: MediaItem) {
+        val renderersFactory = DemoUtil.buildRenderersFactory(
+            this, isNonNullAndChecked(preferExtensionDecodersMenuItem)
+        )
+        downloadTracker?.toggleDownload(supportFragmentManager, mediaItem, renderersFactory)
     }
 
     private fun getDownloadUnsupportedStringId(playlistHolder: PlaylistHolder): Int {
@@ -550,9 +595,17 @@ class SampleChooserActivity : AppCompatActivity(), DownloadTracker.Listener, OnC
         private const val TAG = "SampleChooserActivity"
         private const val GROUP_POSITION_PREFERENCE_KEY = "sample_chooser_group_position"
         private const val CHILD_POSITION_PREFERENCE_KEY = "sample_chooser_child_position"
+        private const val POST_NOTIFICATION_PERMISSION_REQUEST_CODE = 100
         private fun isNonNullAndChecked(menuItem: MenuItem?): Boolean {
             // Temporary workaround for layouts that do not inflate the options menu.
             return menuItem != null && menuItem.isChecked
+        }
+
+        @RequiresApi(33)
+        private object Api33 {
+            @get:DoNotInline
+            val postNotificationPermissionString: String
+                get() = Manifest.permission.POST_NOTIFICATIONS
         }
     }
 }
