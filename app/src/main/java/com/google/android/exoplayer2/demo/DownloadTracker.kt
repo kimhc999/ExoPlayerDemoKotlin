@@ -22,20 +22,25 @@ import android.os.AsyncTask
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentManager
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.MediaItem.DrmConfiguration
-import com.google.android.exoplayer2.drm.*
-import com.google.android.exoplayer2.drm.DrmSession.DrmSessionException
-import com.google.android.exoplayer2.offline.*
-import com.google.android.exoplayer2.offline.DownloadHelper.LiveContentUnsupportedException
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
-import com.google.android.exoplayer2.upstream.*
-import com.google.android.exoplayer2.util.*
+import androidx.media3.common.DrmInitData
+import androidx.media3.common.Format
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaItem.DrmConfiguration
+import androidx.media3.exoplayer.drm.*
+import androidx.media3.exoplayer.drm.DrmSession.DrmSessionException
+import androidx.media3.exoplayer.offline.*
+import androidx.media3.exoplayer.offline.DownloadHelper.LiveContentUnsupportedException
+import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.datasource.*
+import androidx.media3.exoplayer.util.*
+import androidx.media3.common.util.*
+import androidx.media3.exoplayer.RenderersFactory
 import com.google.common.base.Preconditions
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArraySet
 
 /** Tracks media that has been downloaded.  */
+@UnstableApi
 class DownloadTracker(
     context: Context, dataSourceFactory: DataSource.Factory?, downloadManager: DownloadManager?
 ) {

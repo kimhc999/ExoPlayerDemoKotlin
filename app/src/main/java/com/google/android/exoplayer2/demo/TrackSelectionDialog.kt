@@ -30,18 +30,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.C.TrackType
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Tracks
-import com.google.android.exoplayer2.source.TrackGroup
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
-import com.google.android.exoplayer2.ui.TrackSelectionView
+import androidx.media3.common.C
+import androidx.media3.common.C.TrackType
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.TrackGroup
+import androidx.media3.common.TrackSelectionOverride
+import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.TrackSelectionView
 import com.google.android.material.tabs.TabLayout
 import com.google.common.collect.ImmutableList
 
-/** Dialog to select tracks.  */
+@UnstableApi /** Dialog to select tracks.  */
 class TrackSelectionDialog : DialogFragment() {
     /** Called when tracks are selected.  */
     interface TrackSelectionListener {
@@ -85,7 +86,7 @@ class TrackSelectionDialog : DialogFragment() {
                     trackGroups.add(trackGroup)
                 }
             }
-            if (!trackGroups.isEmpty()) {
+            if (trackGroups.isNotEmpty()) {
                 val tabFragment = TrackSelectionViewFragment()
                 tabFragment.init(
                     trackGroups,
@@ -119,14 +120,14 @@ class TrackSelectionDialog : DialogFragment() {
      */
     fun getOverrides(trackType: Int): Map<TrackGroup, TrackSelectionOverride> {
         val trackView = tabFragments[trackType]
-        return trackView.overrides ?: emptyMap()
+        return trackView?.overrides ?: emptyMap()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // We need to own the view to let tab layout work correctly on all API levels. We can't use
         // AlertDialog because it owns the view itself, so we use AppCompatDialog instead, themed using
         // the AlertDialog theme overlay with force-enabled title.
-        val dialog = AppCompatDialog(activity, R.style.TrackSelectionDialogThemeOverlay)
+        val dialog = AppCompatDialog(requireActivity(), R.style.TrackSelectionDialogThemeOverlay)
         dialog.setTitle(titleId)
         return dialog
     }
@@ -174,7 +175,7 @@ class TrackSelectionDialog : DialogFragment() {
         }
     }
 
-    /** Fragment to show a track selection in tab of the track selection dialog.  */
+    @UnstableApi /** Fragment to show a track selection in tab of the track selection dialog.  */
     class TrackSelectionViewFragment : Fragment(), TrackSelectionView.TrackSelectionListener {
         private var trackGroups: List<Tracks.Group>? = null
         private var allowAdaptiveSelections = false

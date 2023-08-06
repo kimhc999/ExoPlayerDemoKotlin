@@ -17,11 +17,11 @@ package com.google.android.exoplayer2.demo
 
 import android.content.Intent
 import android.net.Uri
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.MediaItem.*
-import com.google.android.exoplayer2.MediaMetadata
-import com.google.android.exoplayer2.util.Util
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaItem.*
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.util.Util
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
 

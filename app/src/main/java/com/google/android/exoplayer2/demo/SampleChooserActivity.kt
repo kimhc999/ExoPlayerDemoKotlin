@@ -26,13 +26,13 @@ import android.view.*
 import android.widget.*
 import android.widget.ExpandableListView.OnChildClickListener
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.MediaItem.*
-import com.google.android.exoplayer2.offline.DownloadService
-import com.google.android.exoplayer2.upstream.DataSourceInputStream
-import com.google.android.exoplayer2.upstream.DataSourceUtil
-import com.google.android.exoplayer2.upstream.DataSpec
-import com.google.android.exoplayer2.util.*
+import androidx.media3.common.MediaItem.*
+import androidx.media3.exoplayer.offline.DownloadService
+import androidx.media3.datasource.DataSourceInputStream
+import androidx.media3.datasource.DataSourceUtil
+import androidx.media3.datasource.DataSpec
+import androidx.media3.common.util.*
+import androidx.media3.common.*
 import com.google.common.base.Objects
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
@@ -43,6 +43,7 @@ import java.io.InputStreamReader
 import java.util.*
 
 /** An activity for selecting from a list of media samples.  */
+@UnstableApi
 class SampleChooserActivity : AppCompatActivity(), DownloadTracker.Listener, OnChildClickListener {
     private var uris: Array<String> = emptyArray()
     private var useExtensionRenderers = false
