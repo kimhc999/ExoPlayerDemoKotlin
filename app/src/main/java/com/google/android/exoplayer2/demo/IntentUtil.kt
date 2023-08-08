@@ -84,7 +84,7 @@ object IntentUtil {
                 intent.putExtra(TITLE_EXTRA, mediaItem.mediaMetadata.title)
             }
             addPlaybackPropertiesToIntent(localConfiguration, intent,  /* extrasKeySuffix= */"")
-            addClippingConfigurationToIntent(
+            addLocalConfigurationToIntent(
                 mediaItem.clippingConfiguration, intent,  /* extrasKeySuffix= */""
             )
         } else {
@@ -97,7 +97,7 @@ object IntentUtil {
                     localConfiguration, intent,  /* extrasKeySuffix= */
                     "_$i"
                 )
-                addClippingConfigurationToIntent(
+                addLocalConfigurationToIntent(
                     mediaItem.clippingConfiguration, intent,  /* extrasKeySuffix= */"_$i"
                 )
                 if (mediaItem.mediaMetadata.title != null) {
@@ -270,7 +270,7 @@ object IntentUtil {
         }
     }
 
-    private fun addClippingConfigurationToIntent(
+    private fun addLocalConfigurationToIntent(
         clippingConfiguration: ClippingConfiguration,
         intent: Intent,
         extrasKeySuffix: String
